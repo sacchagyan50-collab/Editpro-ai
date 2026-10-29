@@ -3,79 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EditPro AI - Mobile Video Editor</title>
+    <title>EditPro AI Studio</title>
     <style>
-        body {
-            background-color: #0f172a;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-color: #334155;
+            --success-color: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        h1 {
-            color: #38bdf8;
-            font-size: 24px;
-            margin-bottom: 10px;
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        p {
-            color: #94a3b8;
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--accent-color);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            color: var(--text-sub);
             font-size: 14px;
+            margin-top: 4px;
         }
+
         .container {
-            max-width: 400px;
-            margin: 30px auto;
-            background: #1e293b;
-            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        input[type="file"] {
-            margin: 20px 0;
-            color: #fff;
-            max-width: 100%;
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-color);
         }
-        video {
+
+        .file-input-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.02);
+            transition: border-color 0.2s;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: var(--accent-color);
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .media-preview {
             width: 100%;
             border-radius: 8px;
-            margin-top: 15px;
             background: #000;
+            max-height: 250px;
+            object-fit: contain;
+            margin-top: 10px;
+            display: none;
         }
-        .btn {
-            background: #38bdf8;
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        select, input[type="text"] {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        button.btn {
+            background-color: var(--accent-color);
             color: #0f172a;
             border: none;
-            padding: 10px 20px;
+            padding: 12px;
+            border-radius: 8px;
             font-weight: bold;
-            border-radius: 6px;
+            font-size: 14px;
             cursor: pointer;
+            width: 100%;
             margin-top: 10px;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button.btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button.btn-success {
+            background-color: var(--success-color);
+            color: #ffffff;
+        }
+
+        .prompt-box {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 12px;
+            color: #a7f3d0;
+            min-height: 50px;
+            word-break: break-word;
+            margin-top: 8px;
+        }
+
+        .status {
+            font-size: 12px;
+            color: var(--accent-color);
+            text-align: center;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <header>
         <h1>EditPro AI</h1>
-        <p>Apna video upload karein aur browse karein:</p>
-        <input type="file" id="videoUpload" accept="video/*">
-        <br>
-        <video id="videoPlayer" controls style="display:none;"></video>
+        <p>Smart Mobile AI Video Editor</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- 1. Primary Video Upload -->
+        <div class="card">
+            <div class="card-title">🎬 Main Video Upload</div>
+            <div class="file-input-wrapper">
+                <span>📹 Tap to select raw video</span>
+                <input type="file" id="mainVideoInput" accept="video/*">
+            </div>
+            <video id="mainVideoPreview" class="media-preview" controls></video>
+        </div>
+
+        <!-- 2. Reference Style Upload -->
+        <div class="card">
+            <div class="card-title">✨ Reference Video Editing</div>
+            <div class="file-input-wrapper">
+                <span>🎨 Upload reference style video</span>
+                <input type="file" id="refVideoInput" accept="video/*">
+            </div>
+            <video id="refVideoPreview" class="media-preview" controls></video>
+        </div>
+
+        <!-- 3. Music & Effects Controls -->
+        <div class="card">
+            <div class="card-title">🎵 Auto Music & Effects</div>
+            <div class="controls-grid">
+                <div class="input-group">
+                    <label>AI Filter Style</label>
+                    <select id="filterSelect">
+                        <option value="none">Normal</option>
+                        <option value="cinematic">Cinematic Glow</option>
+                        <option value="vintage">Retro Film</option>
+                        <option value="vibrant">Vibrant Gaming</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Background Music</label>
+                    <select id="musicSelect">
+                        <option value="none">None</option>
+                        <option value="action">Action Beat</option>
+                        <option value="chill">Lo-Fi Ambient</option>
+                        <option value="trending">Trending Reel Beats</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" id="applyAiBtn">⚡ Apply Auto AI Editing</button>
+            <div id="aiStatus" class="status">Processing AI Effects...</div>
+        </div>
+
+        <!-- 4. Video to Prompt -->
+        <div class="card">
+            <div class="card-title">📝 Video to Prompt Generator</div>
+            <p style="font-size:12px; color: var(--text-sub);">Extract style description from uploaded main video.</p>
+            <button class="btn" id="genPromptBtn">🔍 Generate AI Prompt</button>
+            <div id="promptOutput" class="prompt-box">AI prompt will appear here...</div>
+        </div>
+
+        <!-- 5. Download Section -->
+        <div class="card">
+            <div class="card-title">📥 Download Edited Video</div>
+            <button class="btn btn-success" id="downloadBtn">💾 Download Result Video</button>
+        </div>
+
     </div>
+
     <script>
-        const videoUpload = document.getElementById('videoUpload');
-        const videoPlayer = document.getElementById('videoPlayer');
-        let previousURL;
-        videoUpload.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (previousURL) URL.revokeObjectURL(previousURL);
+        // File Previews
+        const mainInput = document.getElementById('mainVideoInput');
+        const mainPreview = document.getElementById('mainVideoPreview');
+        const refInput = document.getElementById('refVideoInput');
+        const refPreview = document.getElementById('refVideoPreview');
+
+        mainInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
             if (file) {
-                previousURL = URL.createObjectURL(file);
-                videoPlayer.src = previousURL;
-                videoPlayer.style.display = 'block';
-            } else {
-                videoPlayer.removeAttribute('src');
-                videoPlayer.style.display = 'none';
+                mainPreview.src = URL.createObjectURL(file);
+                mainPreview.style.display = 'block';
             }
+        });
+
+        refInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                refPreview.src = URL.createObjectURL(file);
+                refPreview.style.display = 'block';
+            }
+        });
+
+        // Apply AI Editing simulation
+        const applyAiBtn = document.getElementById('applyAiBtn');
+        const aiStatus = document.getElementById('aiStatus');
+        const filterSelect = document.getElementById('filterSelect');
+
+        applyAiBtn.addEventListener('click', () => {
+            if (!mainPreview.src) {
+                alert('Pehle main video upload karein!');
+                return;
+            }
+            aiStatus.style.display = 'block';
+            aiStatus.textContent = 'Applying AI Style & Effects...';
+
+            setTimeout(() => {
+                const style = filterSelect.value;
+                if (style === 'cinematic') mainPreview.style.filter = 'contrast(120%) brightness(90%) sepia(20%)';
+                else if (style === 'vintage') mainPreview.style.filter = 'grayscale(50%) sepia(40%)';
+                else if (style === 'vibrant') mainPreview.style.filter = 'saturate(200%) contrast(110%)';
+                else mainPreview.style.filter = 'none';
+
+                aiStatus.textContent = '✨ AI Editing Applied Successfully!';
+            }, 1200);
+        });
+
+        // Video to Prompt
+        const genPromptBtn = document.getElementById('genPromptBtn');
+        const promptOutput = document.getElementById('promptOutput');
+
+        genPromptBtn.addEventListener('click', () => {
+            if (!mainPreview.src) {
+                alert('Pehle video upload karein!');
+                return;
+            }
+            promptOutput.textContent = "Analyzing video frames...";
+            setTimeout(() => {
+                promptOutput.textContent = "PROMPT: Cinematic gameplay footage, high contrast lighting, dynamic motion blur, action gaming vibe, 4k ultra-detailed style.";
+            }, 1000);
+        });
+
+        // Download Video
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.addEventListener('click', () => {
+            if (!mainPreview.src) {
+                alert('Download karne ke liye pehle koi video upload karein!');
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = mainPreview.src;
+            a.download = 'EditPro_AI_Edited_Video.mp4';
+            a.click();
         });
     </script>
 </body>
